@@ -1,5 +1,6 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
+const Razorpay = require("razorpay");
 const User = require("../model/userSchema");
 const Wishlist = require("../model/wishlistSchema");
 const Otp = require("../model/otpSchema");
@@ -9,7 +10,9 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Cart = require("../model/cartSchema");
 const Address = require("../model/addressSchema");
+const Order = require("../model/orderSchema");
 const nodemailer = require("nodemailer");
+const { log } = require("console");
 // const { log } = require("console");
 // const { default: wishlist } = require("../../frondend/src/components/Wishlist");
 
@@ -57,8 +60,8 @@ const signUp = async (req, res) => {
       }
       return res.status(400).json({ message: "Email already registered" });
     }
-    const hashedPassword = await bcrypt.hash(password, 10); 
-    const newUser = new User({ name, email, password: hashedPassword }); 
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
     const otp = crypto.randomInt(100000, 999999).toString();
     await sendOtp(email, otp, newUser._id);
@@ -217,13 +220,11 @@ const addWishlist = async (req, res) => {
     let wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
-      // Create new wishlist document if not exists
       wishlist = new Wishlist({
         userId,
         products: [productId],
       });
     } else {
-      // Prevent duplicate product entries
       if (wishlist.products.includes(productId)) {
         return res.status(400).json({ message: "Product already in wishlist" });
       }
@@ -246,6 +247,21 @@ const getWishlist = async (req, res) => {
     res.status(200).json(wishlist);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getWishProd = async (req, res) => {
+  try {
+    const { productId, userId } = req.params;
+    const wish = await Wishlist.findOne({
+      userId: userId,
+      products: productId,
+    });
+
+    res.status(200).json({ wish, message: "sucess" });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -274,30 +290,112 @@ const removeWishlist = async (req, res) => {
     res.status(500).json({ message: "Error removing product from wishlist" });
   }
 };
- 
-const addAddress = async (req, res) => {  
-  const id = req.params
-  const { streetAddress, city, state, country, zipCode } = req.body;   
+
+const addAddress = async (req, res) => {
+  const id = req.params;
+  const { streetAddress, city, state, country, zipCode } = req.body;
   try {
-    const address = await Address.create({address:streetAddress,city,state,country,pin:zipCode,userId:id});
+    const address = await Address.create({
+      address: streetAddress,
+      city,
+      state,
+      country,
+      pin: zipCode,
+      userId: id,
+    });
     res.status(200).json({ message: "Address added successfully", address });
   } catch (error) {
-     console.error("Error adding address:", error);
-    res.status(500).json({ message: "Failed to add address" });  
+    console.error("Error adding address:", error);
+    res.status(500).json({ message: "Failed to add address" });
   }
 };
-
 
 const getAddress = async (req, res) => {
   const id = req.params.id;
   try {
-    const data = await Address.find({ userId: id }); 
+    const data = await Address.find({ userId: id });
     res.status(200).json({ address: data });
   } catch (error) {
     console.error("Error fetching address:", error);
     res.status(500).json({ message: "Failed to fetch address" });
   }
 };
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
+
+const payment = async (req, res) => {
+  const { amount } = req.body;
+  const options = {
+    amount: amount * 100, // Ensure amount is in paise
+    currency: "INR",
+    receipt: `order_rcptid_${Date.now()}`,
+  };
+
+  try {
+    const order = await razorpay.orders.create(options);
+    res.json(order);
+  } catch (err) {
+    console.error("Razorpay order creation failed:", err);
+    res
+      .status(500)
+      .json({ message: "Error creating order", error: err.message });
+  }
+};
+
+
+const verify = async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    req.body;
+
+  const sign = razorpay_order_id + "|" + razorpay_payment_id;
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
+    .update(sign.toString())
+    .digest("hex");
+
+  if (expectedSignature === razorpay_signature) {
+    res.json({ success: true, message: "Payment verified successfully" });
+  } else {
+    res
+      .status(400)
+      .json({ success: false, message: "Payment verification failed" });
+  }
+};
+
+const addOrder = async (req, res) => {
+  const { selectedAddressId, cartItems, user, totalPrice } = req.body;
+  const data = await Address.findById(selectedAddressId);
+  try {
+    await Order.create({
+      userId: user._id,
+      name: user.name,
+      address: data,
+      cartitem: cartItems,
+      totalprice: totalPrice,
+      
+    });
+
+    const deleteResult = await Cart.deleteMany({ userId: user._id });
+  } catch (error) {
+        console.error("Error in addOrder:", error);
+    res.status(500).json({ message: "Failed to place order" });
+  }
+};
+
+
+const getOeder = async (req,res)=>{
+  const id = req.params.id
+  try {
+    const data = await Order.find({userId:id})
+  res.status(200).json({ data });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ message: "Failed to fetch order" });
+  }
+}
 
 module.exports = {
   signUp,
@@ -311,7 +409,12 @@ module.exports = {
   otpVerification,
   addWishlist,
   getWishlist,
+  getWishProd,
   removeWishlist,
   addAddress,
   getAddress,
+  payment,
+  verify,
+  addOrder,
+  getOeder
 };

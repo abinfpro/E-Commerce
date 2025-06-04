@@ -13,6 +13,7 @@ const wishlistSchema = new mongoose.Schema({
       ref: "Product",
     },
   ],
+  
 });
 
 module.exports = mongoose.model("Wishlist", wishlistSchema);

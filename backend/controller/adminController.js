@@ -22,7 +22,7 @@ const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id;
     const del = await Product.findByIdAndDelete(id);
-    return res.status(201).json();
+    return res.status(201).json(); 
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

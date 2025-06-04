@@ -16,13 +16,24 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wish,setWish]=useState(false)
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/auth/productdetails/${id}`);
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/productdetails/${id}`
+        );
         setProduct(res.data.product);
+
+        const { data } = await axios.get(
+          `http://localhost:5000/api/auth/getwishlistproduct/${id}/${user._id}`
+        );
+        console.log("res data", data);
+        if (data.wish._id) {
+          setIsWishlisted(true);
+        }
       } catch (err) {
         toast.error("Error fetching product");
       } finally {
@@ -30,7 +41,7 @@ export default function ProductDetails() {
       }
     };
     fetchProduct();
-  }, [id]);
+  }, [id,wish]);
 
   const handleAddToCart = async (productId) => {
     try {
@@ -48,20 +59,24 @@ export default function ProductDetails() {
 
   const handleWishlistToggle = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/wishlist",{
+      const res = await axios.post("http://localhost:5000/api/auth/wishlist", {
         userId: user._id,
-        productId: product._id
-      })
-      setIsWishlisted(!isWishlisted);
+        productId: product._id,
+      });
+      setWish(true)
+      // setIsWishlisted(false);
       //  setIsWishlisted(wishlistProducts.includes(product._id));
-      toast.success(`${product.name} ${!isWishlisted ? "added to" : "removed from"} wishlist`);
+      toast.success(
+        `${product.name} ${
+          !isWishlisted ? "added to" : "removed from"
+        } wishlist`
+      );
     } catch (error) {
-       toast.error("Something went wrong");
-    console.error(error);
+      toast.error("Something went wrong");
+      console.error(error);
     }
-   }
+  };
 
-   
   const incrementQuantity = () => {
     setQuantity((prev) => prev + 1);
   };
@@ -71,13 +86,13 @@ export default function ProductDetails() {
   };
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
-  if (!product) return <div className="p-8 text-center">Product not found.</div>;
+  if (!product)
+    return <div className="p-8 text-center">Product not found.</div>;
 
   return (
     <div>
       <Header />
       <div className="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
-        
         {/* Image Section */}
         <div className="relative">
           <img
@@ -91,7 +106,11 @@ export default function ProductDetails() {
               isWishlisted ? "bg-red-100 text-red-600" : "bg-white"
             } hover:scale-110 transition`}
           >
-            <Heart className={`w-6 h-6 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`} />
+            <Heart
+              className={`w-6 h-6 ${
+                isWishlisted ? "fill-red-500 stroke-red-500" : ""
+              }`}
+            />
           </button>
         </div>
 
@@ -111,17 +130,25 @@ export default function ProductDetails() {
           {/* <div className="text-gray-600 text-sm">SKU: {product.sku || "003"}</div> */}
 
           {/* Price */}
-          <div className="text-2xl font-bold text-green-700">${product.price}</div>
+          <div className="text-2xl font-bold text-green-700">
+            ${product.price}
+          </div>
 
           {/* Quantity Selector */}
           <div className="flex items-center space-x-4 mt-4">
             <span className="font-semibold">Quantity</span>
             <div className="flex items-center border rounded overflow-hidden">
-              <button onClick={decrementQuantity} className="px-3 py-1 hover:bg-gray-100">
+              <button
+                onClick={decrementQuantity}
+                className="px-3 py-1 hover:bg-gray-100"
+              >
                 <Minus className="w-4 h-4" />
               </button>
               <span className="px-5">{quantity}</span>
-              <button onClick={incrementQuantity} className="px-3 py-1 hover:bg-gray-100">
+              <button
+                onClick={incrementQuantity}
+                className="px-3 py-1 hover:bg-gray-100"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -137,9 +164,7 @@ export default function ProductDetails() {
               ADD TO CART
             </button>
 
-            <button
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition"
-            >
+            <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition">
               BUY NOW
             </button>
           </div>

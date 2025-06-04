@@ -5,19 +5,28 @@ import { useUser } from "./Usercontext";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
-
 export default function EnhancedSimpleProfile() {
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
-    const location = useLocation();
-  const {cartItems } = location.state || {};
+  const location = useLocation();
+  const { cartItems } = location.state || {};
 
   useEffect(() => {
-    if (user?._id) {
-      axios.get(`http://localhost:5000/api/auth/oder,${user._id}`)
-        .then(res => setOrders(res.data))
-        .catch(err => console.error("Error fetching orders:", err));
-    }
+    const fetchOrders = async () => {
+      if (user?._id) {
+        try {
+          const res = await axios.get(
+            `http://localhost:5000/api/auth/getoder/${user._id}`
+          );
+          console.log(res.data.data);
+          setOrders(res.data.data);
+        } catch (err) {
+          console.error("Error fetching orders:", err);
+        }
+      }
+    };
+
+    fetchOrders();
   }, [user]);
 
   return (
@@ -74,19 +83,35 @@ export default function EnhancedSimpleProfile() {
           {/* Order List */}
           <div className="mt-10">
             <h2 className="text-lg font-semibold mb-4">My Orders</h2>
-            {/* {cartItems.length === 0 ? (
+            {orders.length === 0 ? (
               <p className="text-gray-500">No orders found.</p>
             ) : (
               <ul className="space-y-4">
-                {cartItems.map(order => (
-                  <li key={order._id} className="border p-4 rounded-lg shadow-sm">
-                    <p className="text-sm font-medium text-gray-800">Order ID: {order._id}</p>
-                    <p className="text-sm text-gray-600">Total: ₹{order.total}</p>
-                    <p className="text-sm text-gray-600">Status: {order.status}</p>
-                  </li>
-                ))}
+         {Array.isArray(orders) && orders.map(order => (
+  <li key={order._id} className="border p-4 rounded-lg shadow-sm">
+    <p className="text-sm font-medium text-gray-800">Name: {order.name}</p>
+    <p className="text-sm text-gray-600">Total: ₹{order.totalprice}</p>
+    <p className="text-sm text-gray-600">
+      ADDRESS: {order.address?.address}, {order.address?.city}, {order.address?.state}, {order.address?.country} <br />
+      PINCODE: {order.address?.pin}
+    </p>
+
+    <div className="mt-2">
+      <p className="font-semibold text-sm">Products:</p>
+      <ul className="pl-4 list-disc">
+        {order.cartitem.map((item, index) => (
+          <li key={index} className="text-sm text-gray-700">
+            {item.productId.name} <br /> Quantity: {item.quantity}
+            {/* {item.productId.image} */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </li>
+))}
+
               </ul>
-            )}  */}
+            )}
           </div>
         </div>
       </div>
