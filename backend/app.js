@@ -16,7 +16,6 @@ app.use(
 app.use(express.json());
 app.use("/api/auth",userRoute);
 app.use("/api/admin",adminRoute)
-
 app.use(express.urlencoded({ extended: true }));
 
 

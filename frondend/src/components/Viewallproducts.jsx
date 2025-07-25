@@ -11,7 +11,7 @@ export default function AllProducts() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect(() => { 
     const fetchProducts = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/auth/getproduct");

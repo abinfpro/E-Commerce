@@ -3,17 +3,17 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
   userId: {
     type: String,
-    unique: true,
+    // unique: true,
   },
   name: {
     type: String,
     required: true,
-    unique: true,
+    // unique: true,
   },
   address: {
     type: Object,
     required: true,
-  },
+  },   
   cartitem: {
     type: Array,
   },

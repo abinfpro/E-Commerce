@@ -6,6 +6,7 @@ import Header from "./Header";
 import { useUser } from "./Usercontext";
 import { toast } from "react-hot-toast";
 
+
 const loadRazorpayScript = () =>
   new Promise((resolve) => {
     const script = document.createElement("script");
@@ -75,7 +76,7 @@ export default function PaymentForm() {
         formData.country
       );
     }
-    return true; // For payment tab, validation is handled by Razorpay
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -112,25 +113,32 @@ export default function PaymentForm() {
       return;
     }
 
+    
     const res = await loadRazorpayScript();
 
     const orderResponse = await axios.post(
       "http://localhost:5000/api/auth/payment",
       {
-        amount: finalTotal,
+        // amount: finalTotal
+        amount: Math.round(finalTotal * 100),
         userId: user._id,
       }
     );
 
-    const order = await axios.post("http://localhost:5000/api/auth/addorder", {
-      selectedAddressId,
-      cartItems,
-      user,
-      totalPrice,
-    });
+      const order = await axios.post(
+              "http://localhost:5000/api/auth/addorder",
+              {
+                selectedAddressId,
+                cartItems,
+                userId: user._id, 
+                user,
+                totalPrice,
+              
+              }
+            );            
 
     const { id: orderId, amount, currency } = orderResponse.data;
-
+    
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount,
@@ -153,17 +161,6 @@ export default function PaymentForm() {
           if (verificationResponse.data.success) {
             alert("Payment successful!");
 
-            // const order = await axios.post(
-            //   "http://localhost:5000/api/auth/addorder",
-            //   {
-            //     selectedAddressId,
-            //     cartItems,
-            //     user,
-            //     totalPrice,
-            //   }
-            // );
-
-            // Redirect or UI update
           } else {
             alert("Payment verification failed!");
           }
@@ -185,6 +182,7 @@ export default function PaymentForm() {
     paymentObject.open();
   };
 
+  
   return (
     <>
       <Header />
@@ -242,7 +240,7 @@ export default function PaymentForm() {
                   onChange={() => setSelectedAddressId(addr._id)}
                 />
                 <span className="font-semibold">{addr.name}</span>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600"> 
                   {addr.address}, {addr.city}, {addr.state}, {addr.country},{" "}
                   {addr.pin}
                 </p>

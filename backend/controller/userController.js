@@ -13,8 +13,6 @@ const Address = require("../model/addressSchema");
 const Order = require("../model/orderSchema");
 const nodemailer = require("nodemailer");
 const { log } = require("console");
-// const { log } = require("console");
-// const { default: wishlist } = require("../../frondend/src/components/Wishlist");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -53,7 +51,6 @@ const signUp = async (req, res) => {
         await Otp.deleteMany({ userId: existingUser._id });
         const otp = crypto.randomInt(100000, 999999).toString();
         await sendOtp(email, otp, existingUser);
-        // await Otp.create({ userId: existingUser._id, otp: otp });
         return res
           .status(200)
           .json({ message: "OTP resent. Please verify.", user: existingUser });
@@ -218,19 +215,17 @@ const addWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
     let wishlist = await Wishlist.findOne({ userId });
-
     if (!wishlist) {
       wishlist = new Wishlist({
         userId,
         products: [productId],
       });
-    } else {
+    } else{
       if (wishlist.products.includes(productId)) {
         return res.status(400).json({ message: "Product already in wishlist" });
       }
       wishlist.products.push(productId);
     }
-
     await wishlist.save();
     res.status(201).json({ message: "Added to wishlist", wishlist });
   } catch (error) {
@@ -272,8 +267,8 @@ const removeWishlist = async (req, res) => {
 
     // Remove the product from the user's wishlist
     const wishlist = await Wishlist.findOneAndUpdate(
-      { userId }, // Find wishlist by userId
-      { $pull: { products: productId } }, // Remove the product
+      { userId },
+      { $pull: { products: productId } },
       { new: true }
     );
     if (!wishlist) {
@@ -329,7 +324,7 @@ const razorpay = new Razorpay({
 const payment = async (req, res) => {
   const { amount } = req.body;
   const options = {
-    amount: amount * 100, // Ensure amount is in paise
+    amount: amount * 100,
     currency: "INR",
     receipt: `order_rcptid_${Date.now()}`,
   };
@@ -345,10 +340,8 @@ const payment = async (req, res) => {
   }
 };
 
-
 const verify = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-    req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
   const sign = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
@@ -365,37 +358,49 @@ const verify = async (req, res) => {
   }
 };
 
-const addOrder = async (req, res) => {
-  const { selectedAddressId, cartItems, user, totalPrice } = req.body;
-  const data = await Address.findById(selectedAddressId);
-  try {
-    await Order.create({
-      userId: user._id,
-      name: user.name,
-      address: data,
-      cartitem: cartItems,
-      totalprice: totalPrice,
-      
-    });
 
-    const deleteResult = await Cart.deleteMany({ userId: user._id });
+
+const addOrder = async (req, res) => {
+  const { selectedAddressId, cartItems, user, userId, totalPrice } = req.body;
+
+  try {
+    const existingOrder = await Order.findOne({ userId: userId });
+    const address = await Address.findById(selectedAddressId);
+    if (existingOrder) {
+      existingOrder.cartitem.push(...cartItems);
+      await existingOrder.save(); 
+    } else {
+      await Order.create({
+        userId: user._id,
+        name: user.name,
+        address,
+        cartitem: cartItems,
+        totalprice: totalPrice,
+      });
+    }
+
+    // Delete user's cart
+    await Cart.deleteMany({ userId: user._id });
+
+    res.status(201).json({ message: "Order placed successfully" });
+
   } catch (error) {
-        console.error("Error in addOrder:", error);
+    console.error("Error in addOrder:", error);
     res.status(500).json({ message: "Failed to place order" });
   }
 };
 
 
-const getOeder = async (req,res)=>{
-  const id = req.params.id
+const getOeder = async (req, res) => {
+  const id = req.params.id;
   try {
-    const data = await Order.find({userId:id})
-  res.status(200).json({ data });
+    const data = await Order.find({ userId: id });
+    res.status(200).json({ data });
   } catch (error) {
     console.error("Error fetching order:", error);
     res.status(500).json({ message: "Failed to fetch order" });
   }
-}
+};
 
 module.exports = {
   signUp,
@@ -416,5 +421,33 @@ module.exports = {
   payment,
   verify,
   addOrder,
-  getOeder
+  getOeder,
 };
+
+
+
+
+
+// {
+//   selectedAddressId: '682ff9e38171ac962cd95de7',
+//   cartItems: [{
+//       _id: '68835b7e1e3841eb27049cea',
+//       userId: '682ff7c61eadd36f81750eb9',
+//       productId: [Object],
+//       quantity: 1,
+//       createdAt: '2025-07-25T10:25:02.359Z',
+//       updatedAt: '2025-07-25T10:25:02.359Z',
+//       __v: 0
+//     }],
+//   userId: '682ff7c61eadd36f81750eb9',
+//   user:{
+//     _id: '682ff7c61eadd36f81750eb9',
+//     name: 'abin f',
+//     email: 'abinf.stackup@gmail.com',
+//     role: 'user',
+//     createdAt: '2025-05-23T04:21:26.348Z',
+//     updatedAt: '2025-05-23T04:21:26.348Z',
+//     __v: 0
+//   },
+//   totalPrice: 150
+// }
