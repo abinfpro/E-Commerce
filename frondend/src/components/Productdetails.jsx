@@ -23,12 +23,12 @@ export default function ProductDetails() {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:5000/api/auth/productdetails/${id}`
+          `https://e-commerce-witm.onrender.com/api/auth/productdetails/${id}`
         );
         setProduct(res.data.product);
 
         const { data } = await axios.get(
-          `http://localhost:5000/api/auth/getwishlistproduct/${id}/${user._id}`
+          `https://e-commerce-witm.onrender.com/api/auth/getwishlistproduct/${id}/${user._id}`
         );
         console.log("res data", data);
         if (data.wish._id) {
@@ -45,7 +45,7 @@ export default function ProductDetails() {
 
   const handleAddToCart = async (productId) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/cart", {
+      const res = await axios.post("https://e-commerce-witm.onrender.com/api/auth/cart", {
         userId: user._id,
         productId: productId,
         quantity: quantity,
@@ -59,7 +59,7 @@ export default function ProductDetails() {
 
   const handleWishlistToggle = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/wishlist", {
+      const res = await axios.post("https://e-commerce-witm.onrender.com/api/auth/wishlist", {
         userId: user._id,
         productId: product._id,
       });

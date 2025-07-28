@@ -34,7 +34,7 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         const res = await axios.get(
-          "http://localhost:5000/api/admin/getProduct"
+          "https://e-commerce-witm.onrender.com/api/admin/getProduct"
         );
         setProducts(res.data.product);
       } catch (err) {
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
     setIsAdding(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/addproduct",
+        "https://e-commerce-witm.onrender.com/api/admin/addproduct",
         form
       );
       setProducts([...products, res.data]);
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/admin/updateproduct/${editingId}`,
+        `https://e-commerce-witm.onrender.com/api/admin/updateproduct/${editingId}`,
         form
       );
       setProducts(products.map((p) => (p._id === editingId ? res.data : p)));
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
       return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/deleteproduct/${id}`);
+      await axios.delete(`https://e-commerce-witm.onrender.com/api/admin/deleteproduct/${id}`);
       setProducts(products.filter((p) => p._id !== id));
       toast.success("Product deleted successfully");
     } catch (err) {
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
 
   const handleBlock = async (id, currentStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/admin/blockproduct/${id}`, {
+      await axios.patch(`https://e-commerce-witm.onrender.com/api/admin/blockproduct/${id}`, {
         blocked: !currentStatus,
       });
       setProducts(

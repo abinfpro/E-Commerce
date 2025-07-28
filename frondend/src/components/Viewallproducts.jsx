@@ -14,7 +14,7 @@ export default function AllProducts() {
   useEffect(() => { 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/getproduct");
+        const res = await axios.get("https://e-commerce-witm.onrender.com/api/auth/getproduct");
         setProducts(res.data.product);
       } catch (err) {
         toast.error("Failed to load products");

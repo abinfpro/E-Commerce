@@ -15,7 +15,7 @@ const wishlist = () => {
     if (!user) return;
     const fetchWishlist = async () => {        
       try {
-        const res = await axios.get(`http://localhost:5000/api/auth/wishlist/${user._id}`);        
+        const res = await axios.get(`https://e-commerce-witm.onrender.com/api/auth/wishlist/${user._id}`);        
         setWishlist(res.data);        
       } catch (err) {
         toast.error("Failed to load wishlist");
@@ -28,7 +28,7 @@ const wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-    const res=  await axios.patch(`http://localhost:5000/api/auth/wishlistremove`, { 
+    const res=  await axios.patch(`https://e-commerce-witm.onrender.com/api/auth/wishlistremove`, { 
         userId: user._id,
         productId,
       });

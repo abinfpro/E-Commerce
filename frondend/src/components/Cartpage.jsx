@@ -12,7 +12,7 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/auth/cart/${user._id}`
+        `https://e-commerce-witm.onrender.com/api/auth/cart/${user._id}`
       );
       setCartItems(response.data);
     } catch (error) {
@@ -34,7 +34,7 @@ const CartPage = () => {
   const handleRemoveToCart = async (item) => {
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/auth/cart/${item}`
+        `https://e-commerce-witm.onrender.com/api/auth/cart/${item}`
       );
       fetchCartItems();
     } catch (error) {

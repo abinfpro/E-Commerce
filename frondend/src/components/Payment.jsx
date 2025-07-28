@@ -44,7 +44,7 @@ export default function PaymentForm() {
     const fetchUserAddress = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/auth/address/${user._id}`
+          `https://e-commerce-witm.onrender.com/api/auth/address/${user._id}`
         );
         setAddress(res.data.address);
         // console.log(res.data.address, "fetched data");
@@ -87,7 +87,7 @@ export default function PaymentForm() {
     }
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/auth/address/${user._id}`,
+        `https://e-commerce-witm.onrender.com/api/auth/address/${user._id}`,
         formData
       );
       setShowPopup(true);
@@ -117,7 +117,7 @@ export default function PaymentForm() {
     const res = await loadRazorpayScript();
 
     const orderResponse = await axios.post(
-      "http://localhost:5000/api/auth/payment",
+      "https://e-commerce-witm.onrender.com/api/auth/payment",
       {
         // amount: finalTotal
         amount: Math.round(finalTotal * 100),
@@ -126,7 +126,7 @@ export default function PaymentForm() {
     );
 
       const order = await axios.post(
-              "http://localhost:5000/api/auth/addorder",
+              "https://e-commerce-witm.onrender.com/api/auth/addorder",
               {
                 selectedAddressId,
                 cartItems,
@@ -150,7 +150,7 @@ export default function PaymentForm() {
       order_id: orderId,
       handler: async function (response) {
         try {
-          await axios.post("http://localhost:5000/api/auth/verify", {
+          await axios.post("https://e-commerce-witm.onrender.com/api/auth/verify", {
             userId: user._id,
             cartItems,
             address: selectedAddressId,

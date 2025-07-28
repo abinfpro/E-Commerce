@@ -16,7 +16,7 @@ export default function EnhancedSimpleProfile() {
       if (user?._id) {
         try {
           const res = await axios.get(
-            `http://localhost:5000/api/auth/getoder/${user._id}`
+            `https://e-commerce-witm.onrender.com/api/auth/getoder/${user._id}`
           );
           setOrders(res.data.data);
         } catch (err) {

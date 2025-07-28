@@ -101,7 +101,7 @@ const SignupPage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        "https://e-commerce-witm.onrender.com/api/auth/signup",
         formData
       );
       setApproved(res.data.user);
@@ -116,7 +116,7 @@ const SignupPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/otp", {
+      await axios.post("https://e-commerce-witm.onrender.com/api/auth/otp", {
         otp,
         user: approved,
       });
@@ -136,7 +136,7 @@ const SignupPage = () => {
     try {
       const token = credentialResponse.credential;
 
-      const res = await axios.post("http://localhost:5000/api/auth/google", {
+      const res = await axios.post("https://e-commerce-witm.onrender.com/api/auth/google", {
         token,
       });
 
@@ -264,9 +264,6 @@ const SignupPage = () => {
             >
               {loading ? <ClipLoader size={20} color="white" /> : "Submit"}
             </button>
-            {/* <button onClick={handleResendOtp} className="text-blue-500 hover:underline mt-2">
-  Resend OTP
-</button> */}
           </div>
         </div>
       )}

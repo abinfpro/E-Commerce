@@ -22,7 +22,7 @@ export default function Header() {
     useEffect(() => {
       const fetchCartItems = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/auth/cart/${user._id}`);
+          const response = await axios.get(`https://e-commerce-witm.onrender.com/api/auth/cart/${user._id}`);
           setCartItems(response.data);  
               
         } catch (error) {
