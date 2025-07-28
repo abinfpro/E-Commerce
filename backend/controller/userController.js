@@ -317,7 +317,7 @@ const getAddress = async (req, res) => {
 };
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
+  key_id: process.env.RAZORPAY_KEY_ID, 
   key_secret: process.env.RAZORPAY_SECRET_KEY,
 });
 
