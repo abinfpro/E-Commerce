@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useUser } from "./Usercontext";
 
 const Login = () => {
@@ -112,11 +112,11 @@ const Login = () => {
           </button>
           <p className="text-sm mt-4 text-center text-black">
             Don't have an account?{" "}
-            <a href="/signup">
+            <NavLink to="/signup">
               <span className="underline font-medium cursor-pointer">
                 Signup
               </span>{" "}
-            </a>
+            </NavLink>
           </p>
         </form>
       </div>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Header from "./Header";
+import { NavLink } from "react-router-dom";
 
 export default function About() {
   return (
@@ -83,12 +84,12 @@ export default function About() {
           <p className="mb-6 text-lg">
             Explore our latest collection and walk the talk in style.
           </p>
-          <a
-            href="/all-products"
+          <NavLink
+            to="/all-products"
             className="inline-block px-6 py-3 bg-white text-indigo-600 font-semibold rounded-full hover:bg-gray-100 transition"
           >
             Browse Products
-          </a>
+          </NavLink>
         </motion.div>
       </section>
     </div>

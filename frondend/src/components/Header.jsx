@@ -1,7 +1,7 @@
 import {Disclosure,DisclosureButton,DisclosurePanel,Menu,MenuButton,MenuItem,MenuItems,} from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from "@heroicons/react/24/outline"; // Add ShoppingCartIcon
 import { useUser } from "./Usercontext";
-import { Link, useLocation } from "react-router-dom"; 
+import { Link, NavLink, useLocation } from "react-router-dom"; 
 import { useEffect,useState } from "react";
 import axios from "axios";
 
@@ -122,41 +122,41 @@ export default function Header() {
                 <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none">
                   <MenuItem>
                     {({ active }) => (
-                      <a
-                        href="/profile"
+                      <NavLink
+                        to="/profile"
                         className={classNames(
                           active ? "bg-gray-100" : "",
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
                         Your Profile
-                      </a>
+                      </NavLink>
                     )}
                   </MenuItem>
                   <MenuItem>
                     {({ active }) => (
-                      <a
-                        href="/wishlist"
+                      <NavLink
+                        to="/wishlist"
                         className={classNames(
                           active ? "bg-gray-100" : "",
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
                        Wishlist
-                      </a>
+                      </NavLink>
                     )}
                   </MenuItem>
                   <MenuItem>
                     {({ active }) => (
-                      <a
-                        href="/logout"
+                      <NavLink
+                        to="/logout"
                         className={classNames(
                           active ? "bg-gray-100" : "",
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
                         Sign out
-                      </a>
+                      </NavLink>
                     )}
                   </MenuItem>
                 </MenuItems>
