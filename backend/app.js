@@ -9,7 +9,7 @@ const adminRoute = require("./routes/adminRoute")
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://e-commerce-1-cdo9.onrender.com",
     credentials: true,  
   })
 ); 
