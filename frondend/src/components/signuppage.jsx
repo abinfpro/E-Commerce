@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useUser } from "../components/Usercontext";
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
@@ -228,11 +228,11 @@ const SignupPage = () => {
 
             <p className="text-sm mt-4 text-center text-black">
               Already have an account?{" "}
-              <a href="/login">
+              <NavLink to="/login">
                 <span className="underline font-medium cursor-pointer">
                   Login
                 </span>
-              </a>
+              </NavLink>
             </p>
           </form>
         </div>
